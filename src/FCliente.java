@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -16,8 +17,8 @@ public class FCliente extends FTablero implements Serializable {
 
     Conexion cnx;
     Usuario user;
-    ArrayList<Point> posOponente;
-    ArrayList<Point> marcaOponente;
+    List<String> posOponente;
+    List<String> marcaOponente;
 
     public FCliente() {
         super("Cliente");
@@ -50,8 +51,8 @@ public class FCliente extends FTablero implements Serializable {
         try {
             posOponente = cnx.recibir();
             if (posOponente != null) {
-                for (Point point : posOponente) {
-                    System.out.println("x=" + point.x + ", y=" + point.y);
+                for (String point : posOponente) {
+                    System.out.println(point);
                 }
                 return 1; // Data received from the opponent
             } else {
@@ -71,8 +72,8 @@ public class FCliente extends FTablero implements Serializable {
         try {
             marcaOponente = cnx.recibir();
             if (marcaOponente != null) {
-                for (Point point : marcaOponente) {
-                    System.out.println("x=" + point.x + ", y=" + point.y);
+                for (String point : marcaOponente) {
+                    System.out.println(point);
                 }
                 return 1;
             } else {
@@ -91,7 +92,7 @@ public class FCliente extends FTablero implements Serializable {
     public int siIntersectan(ArrayList<Point> boatPositions) {
         if (boatPositions != null && posOponente != null) {
             for (Point boat : boatPositions) {
-                for (Point pos : posOponente) {
+                for (String pos : posOponente) {
                     if (boat.equals(pos)) {
                         JOptionPane.showMessageDialog(this, "La marca coincide con un barco en la posición: \n" + pos.toString());
                         return 1; // Found intersection

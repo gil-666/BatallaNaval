@@ -1,6 +1,6 @@
 
 import java.awt.BorderLayout;
-import java.awt.List;
+import java.util.List;
 import java.awt.Point;
 import java.util.ArrayList;
 import javax.swing.JDialog;
@@ -18,17 +18,18 @@ import javax.swing.SwingUtilities;
  */
 public class FTablero extends javax.swing.JFrame {
 
-    private ArrayList<Point> boatPositions;
-    private ArrayList<Point> marcaPositions;
+    private List<String> boatPositions;
+    private List<String> marcaPositions;
     int limite;
     int limitemarcas;
     int borde;
+    char[] alphabet = "abcdefghijklmnopqrstuvwxyz".toUpperCase().toCharArray();
 
-    public ArrayList<Point> getBoatPositions() {
+    public List<String> getBoatPositions() {
         return boatPositions;
     }
 
-    public ArrayList<Point> getMarcaPositions() {
+    public List<String> getMarcaPositions() {
         return marcaPositions;
     }
 
@@ -278,11 +279,20 @@ public class FTablero extends javax.swing.JFrame {
     private void pUniverso1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pUniverso1MouseClicked
 
         if (limite > 0) {
-            Point clickedPoint = new Point(evt.getX(), evt.getY());
+            int cellWidth = pUniverso1.getWidth() / pUniverso1.getGRID_SIZE();
+            int cellHeight = pUniverso1.getHeight() / pUniverso1.getGRID_SIZE();
 
-            if (!boatPositions.contains(clickedPoint)) {
-                boatPositions.add(clickedPoint);
-                System.out.println("barco agregado: " + clickedPoint);
+            int column = evt.getX() / cellWidth;
+            int row = evt.getY() / cellHeight;
+
+            char letter = (char) (alphabet[row]);
+            int number = column + 1;
+
+            String position = "" + letter + number;
+
+            if (!boatPositions.contains(position)) {
+                boatPositions.add(position);
+                System.out.println("Barco agregado en posición: " + position);
             }
             limite--;
         }
@@ -298,16 +308,33 @@ public class FTablero extends javax.swing.JFrame {
     }//GEN-LAST:event_formWindowClosed
 
     private void pMapa1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pMapa1MouseClicked
-        if (limitemarcas > 0) {
-            Point clickedPoint = new Point(evt.getX(), evt.getY());
+//        if (limitemarcas > 0) {
+//            Point clickedPoint = new Point(evt.getX(), evt.getY());
+//
+//            if (!marcaPositions.contains(clickedPoint)) {
+//                marcaPositions.add(clickedPoint);
+//                System.out.println("marca agregada: " + clickedPoint);
+//            }
+//            limitemarcas--;
+//        }
+            if (limitemarcas > 0) {
+            int cellWidth = pUniverso1.getWidth() / pUniverso1.getGRID_SIZE();
+            int cellHeight = pUniverso1.getHeight() / pUniverso1.getGRID_SIZE();
 
-            if (!marcaPositions.contains(clickedPoint)) {
-                marcaPositions.add(clickedPoint);
-                System.out.println("marca agregada: " + clickedPoint);
+            int column = evt.getX() / cellWidth;
+            int row = evt.getY() / cellHeight;
+
+            char letter = (char) (alphabet[row]);
+            int number = column + 1;
+
+            String position = "" + letter + number;
+
+            if (!boatPositions.contains(position)) {
+                boatPositions.add(position);
+                System.out.println("Bomba agregada en posición: " + position);
             }
             limitemarcas--;
         }
-
     }//GEN-LAST:event_pMapa1MouseClicked
 
     private void BObtenerMarcasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BObtenerMarcasActionPerformed
@@ -341,8 +368,8 @@ public class FTablero extends javax.swing.JFrame {
             }).start();
         } else {
             JOptionPane.showMessageDialog(this, "Envia todos los tiros hacia el oponente!\nTe faltan (" + limitemarcas + ")");
-            System.out.println("restante "+limitemarcas);
-            System.out.println("size "+marcaPositions.size());
+            System.out.println("restante " + limitemarcas);
+            System.out.println("size " + marcaPositions.size());
         }
 
     }//GEN-LAST:event_BEnviarUbiActionPerformed

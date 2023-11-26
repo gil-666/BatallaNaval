@@ -14,6 +14,8 @@ import java.awt.List;
 public class PUniverso extends javax.swing.JPanel {
 
     private static final int GRID_SIZE = 10;
+
+    
     private static final int CELL_SIZE = 20;
     int limit = 5;//limite de 5 barcos 
 
@@ -31,7 +33,9 @@ public class PUniverso extends javax.swing.JPanel {
     public void setLimit(int limit) {
         this.limit = limit;
     }
-
+public static int getGRID_SIZE() {
+        return GRID_SIZE;
+    }
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);

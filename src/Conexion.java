@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -36,7 +37,7 @@ public class Conexion extends Thread{
         }
     }
     
-    public void enviar(ArrayList<Point> barcoPosiciones){
+    public void enviar(List<String> barcoPosiciones){
         try {
             salida.flush();
             salida.writeObject(barcoPosiciones);
@@ -53,13 +54,13 @@ public class Conexion extends Thread{
             ex.printStackTrace();
         }
     }
-    public ArrayList<Point> recibir() {
-        ArrayList<Point> Posiciones = null;
+    public List<String> recibir() {
+        List<String> Posiciones = null;
         try {
             Object mensaje = entrada.readObject();
             
             if (mensaje instanceof ArrayList) {
-                Posiciones = (ArrayList<Point>) mensaje;
+                Posiciones = (List<String>) mensaje;
             }
         } catch (Exception ex) {
             ex.printStackTrace();
