@@ -20,6 +20,7 @@ public class FServidor extends FTablero implements Serializable {
     Usuario user;
     List<String> posOponente;
     List<String> marcaOponente;
+    List<String> aciertos;
     char[] alphabet = "abcdefghijklmnopqrstuvwxyz".toUpperCase().toCharArray();
 
     public FServidor() {
@@ -50,16 +51,17 @@ public class FServidor extends FTablero implements Serializable {
     }
 
     public int locationOponente() {
+
         try {
             posOponente = cnx.recibir();
-            if (posOponente != null ) {
+            System.out.println(getTitle() + " oponente posiciones:");
+            if (posOponente != null) {
                 for (String point : posOponente) {
                     System.out.println(point);
                 }
                 return 1; // Data received from the opponent
-            }
-            else{
-                
+            } else {
+
                 return 0;
             }
         } catch (Exception e) {
@@ -72,12 +74,16 @@ public class FServidor extends FTablero implements Serializable {
 
     @Override
     public int locationMarca() {
+
         try {
             marcaOponente = cnx.recibir();
+            System.out.println(getTitle() + " oponente posiciones:");
             if (marcaOponente != null) {
                 for (String point : marcaOponente) {
                     System.out.println(point);
                 }
+                aciertos = obtenerAciertos(marcaOponente, getBoatPositions());
+                System.out.println("barcos acertados por "+getTitle()+": "+aciertos.toString());
                 return 1;
             } else {
                 return 0;
@@ -92,18 +98,18 @@ public class FServidor extends FTablero implements Serializable {
 
     }
 
-    public int siIntersectan(ArrayList<Point> boatPositions) {
-        if (boatPositions != null && posOponente != null) {
-            for (Point boat : boatPositions) {
-                for (String pos : posOponente) {
-                    if (boat.equals(pos)) {
-                        JOptionPane.showMessageDialog(this, "La marca coincide con un barco en la posición: \n" + pos.toString());
-                        return 1; // Found intersection
-                    }
+    public List<String> obtenerAciertos(List<String> marcaOponente, List<String> posBarcosjugador) {
+        List<String> aciertos = new ArrayList<>();
+
+        for (String str1 : marcaOponente) {
+            for (String str2 : posBarcosjugador) {
+                if (str1.equals(str2)) {
+                    aciertos.add(str1); // Add the intersecting position to the list
                 }
             }
         }
-        return 0; // No intersection found
+
+        return aciertos; // Return the list of intersecting positions
     }
 
     public static void main(String args[]) {

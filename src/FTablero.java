@@ -46,6 +46,8 @@ public class FTablero extends javax.swing.JFrame {
     public void enviarbarcos() {
 
     }
+    
+    
 
     public void enviarmarcas() {
 
@@ -247,7 +249,7 @@ public class FTablero extends javax.swing.JFrame {
     private void BEnviarbarcoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BEnviarbarcoActionPerformed
         if (!boatPositions.isEmpty() && boatPositions != null && boatPositions.size() == borde) {
             enviarbarcos();
-            System.out.println("Ubicacion barco enviada al oponente");
+            
             BEnviarbarco.setEnabled(false);
             JDialog waitingDialog = new JDialog();
             waitingDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
@@ -266,7 +268,7 @@ public class FTablero extends javax.swing.JFrame {
                 }
 
                 waitingDialog.dispose();
-
+                System.out.println(getTitle()+": Ubicacion barco enviada al oponente");
             }).start();
         } else {
             JOptionPane.showMessageDialog(this, "Envia todos los barcos!\nTe faltan (" + limite + ")");
@@ -329,8 +331,8 @@ public class FTablero extends javax.swing.JFrame {
 
             String position = "" + letter + number;
 
-            if (!boatPositions.contains(position)) {
-                boatPositions.add(position);
+            if (!marcaPositions.contains(position)) {
+                marcaPositions.add(position);
                 System.out.println("Bomba agregada en posición: " + position);
             }
             limitemarcas--;
@@ -342,7 +344,7 @@ public class FTablero extends javax.swing.JFrame {
     }//GEN-LAST:event_BObtenerMarcasActionPerformed
 
     private void BEnviarUbiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BEnviarUbiActionPerformed
-        if (!marcaPositions.isEmpty() && marcaPositions != null && marcaPositions.size() == borde) {
+        if (!marcaPositions.isEmpty() && marcaPositions != null && marcaPositions.size() == borde ) {
             enviarmarcas();
             BEnviarUbi.setEnabled(false);
             JDialog waitingDialog = new JDialog();
@@ -364,6 +366,7 @@ public class FTablero extends javax.swing.JFrame {
                 }
 
                 waitingDialog.dispose();
+                
 
             }).start();
         } else {

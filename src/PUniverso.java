@@ -109,13 +109,6 @@ public static int getGRID_SIZE() {
 
     private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
 
-//        if (limit > 0) {
-//            Barco nave = new Barco(evt.getX() - 25, evt.getY() - 15);
-//            this.add(nave);
-//            nave.setVisible(true);
-//            repaint();
-//            limit--;
-//        }
         if (limit > 0) {
             int cellWidth = getWidth() / GRID_SIZE;
             int cellHeight = getHeight() / GRID_SIZE;
