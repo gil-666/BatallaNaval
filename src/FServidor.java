@@ -83,7 +83,14 @@ public class FServidor extends FTablero implements Serializable {
                     System.out.println(point);
                 }
                 aciertos = obtenerAciertos(marcaOponente, getBoatPositions());
-                System.out.println("barcos acertados por "+getTitle()+": "+aciertos.toString());
+                System.out.println("barcos acertados por " + getTitle() + ": " + aciertos.toString());
+                for (Barco boat : getListaDeBarcos()) {
+                    String boatPosition = boat.getPosition();
+                    if (aciertos.contains(boatPosition)) {
+                        boat.explotar();
+                        // Additional logic based on hit boat, if required
+                    }
+                }
                 return 1;
             } else {
                 return 0;

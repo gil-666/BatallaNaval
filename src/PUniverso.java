@@ -1,7 +1,8 @@
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.List;
+import java.util.List;
+import java.util.ArrayList;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -14,7 +15,21 @@ import java.awt.List;
 public class PUniverso extends javax.swing.JPanel {
 
     private static final int GRID_SIZE = 10;
+    String positionbarco;
+    Barco nave;
+    private List<Barco> listaDeBarcos = new ArrayList<>();
 
+    public Barco getNave() {
+        return nave;
+    }
+
+    public void setNave(Barco nave) {
+        this.nave = nave;
+    }
+    
+    public List<Barco> getListaDeBarcos() {
+        return listaDeBarcos;
+    }
     
     private static final int CELL_SIZE = 20;
     int limit = 5;//limite de 5 barcos 
@@ -115,12 +130,15 @@ public static int getGRID_SIZE() {
 
             int x = evt.getX() / cellWidth * cellWidth;
             int y = evt.getY() / cellHeight * cellHeight;
-
-            Barco nave = new Barco(x, y);
+            
+            nave = new Barco(x, y, positionbarco);
+            setNave(nave);
+            listaDeBarcos.add(nave);
             this.add(nave);
             nave.setVisible(true);
             repaint();
             limit--;
+//            System.out.println("objeto barco: "+nave.toString());
         }
     }//GEN-LAST:event_formMouseClicked
 

@@ -3,6 +3,8 @@ import java.awt.BorderLayout;
 import java.util.List;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -24,6 +26,7 @@ public class FTablero extends javax.swing.JFrame {
     int limitemarcas;
     int borde;
     char[] alphabet = "abcdefghijklmnopqrstuvwxyz".toUpperCase().toCharArray();
+    private List<Barco> listaDeBarcos = new ArrayList<>();
 
     public List<String> getBoatPositions() {
         return boatPositions;
@@ -41,6 +44,11 @@ public class FTablero extends javax.swing.JFrame {
         limite = pUniverso1.getLimit();
         borde = pUniverso1.getLimit();
         limitemarcas = pUniverso1.getLimit();
+        
+    }
+
+    public List<Barco> getListaDeBarcos() {
+        return listaDeBarcos;
     }
 
     public void enviarbarcos() {
@@ -291,12 +299,14 @@ public class FTablero extends javax.swing.JFrame {
             int number = column + 1;
 
             String position = "" + letter + number;
-
+            Barco nave = pUniverso1.getNave();
             if (!boatPositions.contains(position)) {
                 boatPositions.add(position);
                 System.out.println("Barco agregado en posición: " + position);
             }
             limite--;
+            nave.setPosition(position);
+            System.out.println(""+nave.toString());
         }
 
     }//GEN-LAST:event_pUniverso1MouseClicked
@@ -344,6 +354,7 @@ public class FTablero extends javax.swing.JFrame {
     }//GEN-LAST:event_BObtenerMarcasActionPerformed
 
     private void BEnviarUbiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BEnviarUbiActionPerformed
+        listaDeBarcos = pUniverso1.getListaDeBarcos();
         if (!marcaPositions.isEmpty() && marcaPositions != null && marcaPositions.size() == borde ) {
             enviarmarcas();
             BEnviarUbi.setEnabled(false);
