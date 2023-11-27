@@ -25,6 +25,7 @@ public class FTablero extends javax.swing.JFrame {
     int limite;
     int limitemarcas;
     int borde;
+    int bordemarcas;
     char[] alphabet = "abcdefghijklmnopqrstuvwxyz".toUpperCase().toCharArray();
     private List<Barco> listaDeBarcos = new ArrayList<>();
 
@@ -43,7 +44,8 @@ public class FTablero extends javax.swing.JFrame {
         marcaPositions = new ArrayList<>();
         limite = pUniverso1.getLimit();
         borde = pUniverso1.getLimit();
-        limitemarcas = pUniverso1.getLimit();
+        limitemarcas = pMapa1.getLimit();
+        bordemarcas = pMapa1.getLimit();
         
     }
 
@@ -355,7 +357,7 @@ public class FTablero extends javax.swing.JFrame {
 
     private void BEnviarUbiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BEnviarUbiActionPerformed
         listaDeBarcos = pUniverso1.getListaDeBarcos();
-        if (!marcaPositions.isEmpty() && marcaPositions != null && marcaPositions.size() == borde ) {
+        if (!marcaPositions.isEmpty() && marcaPositions != null && marcaPositions.size() == bordemarcas ) {
             enviarmarcas();
             BEnviarUbi.setEnabled(false);
             JDialog waitingDialog = new JDialog();

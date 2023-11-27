@@ -24,8 +24,8 @@ public class FCliente extends FTablero implements Serializable {
         super("Cliente");
         try {
             cnx = new Conexion(new Socket("localhost", 7000), this);
-            String name = JOptionPane.showInputDialog(this, this.getTitle() + ": Ingresa un nombre de usuario");
-            user = new Usuario(name);
+//            String name = JOptionPane.showInputDialog(this, this.getTitle() + ": Ingresa un nombre de usuario");
+//            user = new Usuario(name);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -80,7 +80,14 @@ public class FCliente extends FTablero implements Serializable {
                     System.out.println(point);
                 }
                 aciertos = obtenerAciertos(marcaOponente, getBoatPositions());
-                System.out.println("barcos acertados por "+getTitle()+": "+aciertos.toString());
+                System.out.println("barcos acertados por " + getTitle() + ": " + aciertos.toString());
+                for (Barco boat : getListaDeBarcos()) {
+                    String boatPosition = boat.getPosition();
+                    if (aciertos.contains(boatPosition)) {
+                        boat.explotar();
+                        // Additional logic based on hit boat, if required
+                    }
+                }
                 return 1;
             } else {
                 return 0;

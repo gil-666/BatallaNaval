@@ -7,7 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
 
 /**
  *
@@ -27,9 +31,22 @@ public class FServidor extends FTablero implements Serializable {
         super("Servidor");
         try {
             ss = new ServerSocket(7000);
+            
+            JDialog esperando = new JDialog();
+            esperando.setUndecorated(true);
+            JLabel mensaje = new JLabel("Esperando a que un jugador se una...");
+            mensaje.setHorizontalAlignment(SwingConstants.CENTER);
+            esperando.add(mensaje);
+            esperando.setSize(300, 100);
+            esperando.setLocationRelativeTo(null);
+            esperando.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+            esperando.setVisible(true);
+            
             cnx = new Conexion(ss.accept(), this);
-            String name = JOptionPane.showInputDialog(this, this.getTitle() + ": Ingresa un nombre de usuario");
-            user = new Usuario(name);
+            
+//            String name = JOptionPane.showInputDialog(this, this.getTitle() + ": Ingresa un nombre de usuario");
+//            user = new Usuario(name);
+            esperando.dispose();
         } catch (IOException ex) {
             ex.printStackTrace();
         }

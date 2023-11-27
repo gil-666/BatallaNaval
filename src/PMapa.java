@@ -13,9 +13,17 @@ import java.awt.Graphics;
  */
 public class PMapa extends javax.swing.JPanel{
     private static final int GRID_SIZE = 10;
-    int limit = 5;
+    int limit = 2;
     public PMapa() {
         initComponents();
+    }
+
+    public int getLimit() {
+        return limit;
+    }
+
+    public void setLimit(int limit) {
+        this.limit = limit;
     }
     
     @Override
