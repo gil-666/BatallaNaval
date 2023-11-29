@@ -27,14 +27,13 @@ public class FServidor extends FTablero implements Serializable {
     List<String> aciertos;
     char[] alphabet = "abcdefghijklmnopqrstuvwxyz".toUpperCase().toCharArray();
     int vidas = 5;
-    
-    
+    //boolean hit = false;
 
     public FServidor() {
         super("Servidor");
         try {
-            ss = new ServerSocket(7000);
-            
+            ss = new ServerSocket(6798);
+
             JDialog esperando = new JDialog();
 //            esperando.setUndecorated(false);
             JLabel mensaje = new JLabel("Esperando a que un jugador se una...");// DIALOGO QUE ESPERA A QUE SE CONECTE EL CLIENTE
@@ -44,13 +43,13 @@ public class FServidor extends FTablero implements Serializable {
             esperando.setLocationRelativeTo(null);
             esperando.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
             esperando.setVisible(true);
-            
+
             cnx = new Conexion(ss.accept(), this);
-            
+
 //            String name = JOptionPane.showInputDialog(this, this.getTitle() + ": Ingresa un nombre de usuario");
 //            user = new Usuario(name);
             esperando.dispose();
-            getLVidas1().setText(""+obtenerVidas());
+            getLVidas1().setText("" + obtenerVidas());
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -70,15 +69,18 @@ public class FServidor extends FTablero implements Serializable {
     public void cerrar() {
         cnx.cerrarConexiones();
     }
+
     @Override
     public int obtenerVidas() {
         return vidas;
     }
+
     @Override
-    public void quitarVida(Barco boat){
+    public void quitarVida(Barco boat) {
         getListaDeBarcos().remove(boat);
         vidas--;
     }
+
     public int locationOponente() {
 
         try {
@@ -102,44 +104,52 @@ public class FServidor extends FTablero implements Serializable {
     }
 
     @Override
-    public int locationMarca() {
+public int locationMarca() {
+    try {
+        marcaOponente = cnx.recibir();
+        System.out.println(getTitle() + " oponente posiciones:");
+        if (marcaOponente != null) {
+            boolean hit = false; // Flag to determine if any boat got hit
 
-        try {
-            marcaOponente = cnx.recibir();
-            System.out.println(getTitle() + " oponente posiciones:");
-            if (marcaOponente != null) {
-                for (String point : marcaOponente) {
-                    System.out.println(point);
-                }
-                aciertos = obtenerAciertos(marcaOponente, getBoatPositions());
-                System.out.println("barcos acertados por " + getTitle() + ": " + aciertos.toString());
-                for (Barco boat : getListaDeBarcos()) {
-                    String boatPosition = boat.getPosition();
-                    if (aciertos.contains(boatPosition)) {
-                        boat.explotar();
-                        if(vidas > 0){
-                            quitarVida(boat);
-                            getLVidas1().setText(""+obtenerVidas());
-                        }else{
-                            JOptionPane.showMessageDialog(this, "Has perdido!");
+            for (Barco boat : getListaDeBarcos()) {
+                String boatPosition = boat.getPosition();
+                if (marcaOponente.contains(boatPosition)) {
+                    boat.explotar();
+                    hit = true; // Flag it as a hit
+                    if (vidas != 0) { // If there are lives remaining after the explosion
+                        quitarVida(boat);
+                        getLVidas1().setText("" + obtenerVidas());
+                        if (cnx.recibirVictoria() == 1) {
+                            JOptionPane.showMessageDialog(this, "Ganaste!");
+                            //resetGame(); // Reset the game if the player wins
+                            return 1;
                         }
-                        
-                    }
-                    else{
-                        
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Has perdido!");
+                        //resetGame(); // Reset the game if the player loses
+                        return 1;
                     }
                 }
-                return 1;
-            } else {
-                return 0;
             }
 
-        } catch (Exception e) {
-            // Handle specific exceptions
-            e.printStackTrace(); // Consider logging the exception for debugging
-            JOptionPane.showMessageDialog(this, "Error receiving data from opponent!");
-            return 0; // Return 0 as an indication of an error or no data received
+            // Separate hit detection from message display
+            if (hit) {
+                return 2; // Indicate a hit
+            } else {
+                return 3; // Indicate a miss
+            }
+        } else {
+            return 0;
         }
+    } catch (Exception e) {
+        e.printStackTrace(); // Consider logging the exception for debugging
+        JOptionPane.showMessageDialog(this, "Error receiving data from opponent!");
+        return 0;
+    }
+}
+
+
+    public void ReiniciarJuego() {
 
     }
 

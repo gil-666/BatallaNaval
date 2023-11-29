@@ -5,6 +5,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -46,9 +47,18 @@ public class FTablero extends javax.swing.JFrame {
         borde = pUniverso1.getLimit();
         limitemarcas = pMapa1.getLimit();
         bordemarcas = pMapa1.getLimit();
-        
+        BEnviarUbi.setEnabled(false);
+        pMapa1.setEnabled(false);
+
     }
-   
+
+    public JButton getBEnviarUbi() {
+        return BEnviarUbi;
+    }
+
+    public JButton getBEnviarbarco() {
+        return BEnviarbarco;
+    }
 
     public List<Barco> getListaDeBarcos() {
         return listaDeBarcos;
@@ -65,8 +75,6 @@ public class FTablero extends javax.swing.JFrame {
     public void setLVidas1(JLabel LVidas1) {
         this.LVidas1 = LVidas1;
     }
-    
-    
 
     public void enviarmarcas() {
 
@@ -87,12 +95,21 @@ public class FTablero extends javax.swing.JFrame {
     public int siIntersectan() {
         return 0;
     }
-    
-    public int obtenerVidas(){ 
+
+    public int obtenerVidas() {
         return 0;
     }
-    public void quitarVida(Barco boat){
-        
+
+    public void quitarVida(Barco boat) {
+
+    }
+
+    public PMapa getpMapa1() {
+        return pMapa1;
+    }
+
+    public PUniverso getpUniverso1() {
+        return pUniverso1;
     }
 
     /**
@@ -289,7 +306,7 @@ public class FTablero extends javax.swing.JFrame {
     private void BEnviarbarcoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BEnviarbarcoActionPerformed
         if (!boatPositions.isEmpty() && boatPositions != null && boatPositions.size() == borde) {
             enviarbarcos();
-            
+
             BEnviarbarco.setEnabled(false);
             JDialog waitingDialog = new JDialog();
             waitingDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
@@ -308,7 +325,9 @@ public class FTablero extends javax.swing.JFrame {
                 }
 
                 waitingDialog.dispose();
-                System.out.println(getTitle()+": Ubicacion barco enviada al oponente");
+                BEnviarUbi.setEnabled(true);
+                pMapa1.setEnabled(true);
+                System.out.println(getTitle() + ": Ubicacion barco enviada al oponente");
             }).start();
         } else {
             JOptionPane.showMessageDialog(this, "Envia todos los barcos!\nTe faltan (" + limite + ")");
@@ -319,27 +338,35 @@ public class FTablero extends javax.swing.JFrame {
     }//GEN-LAST:event_BEnviarbarcoActionPerformed
 
     private void pUniverso1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pUniverso1MouseClicked
+        new Thread(() -> {
+            Barco navecheck = pUniverso1.getNave();
+            while (navecheck != null) {
+                if (limite > 0) {
+                    int cellWidth = pUniverso1.getWidth() / pUniverso1.getGRID_SIZE();
+                    int cellHeight = pUniverso1.getHeight() / pUniverso1.getGRID_SIZE();
 
-        if (limite > 0) {
-            int cellWidth = pUniverso1.getWidth() / pUniverso1.getGRID_SIZE();
-            int cellHeight = pUniverso1.getHeight() / pUniverso1.getGRID_SIZE();
+                    int column = evt.getX() / cellWidth;
+                    int row = evt.getY() / cellHeight;
 
-            int column = evt.getX() / cellWidth;
-            int row = evt.getY() / cellHeight;
+                    char letter = (char) (alphabet[row]);
+                    int number = column + 1;
 
-            char letter = (char) (alphabet[row]);
-            int number = column + 1;
+                    String position = "" + letter + number;
+                    Barco nave = pUniverso1.getNave();
+                    if (!boatPositions.contains(position)) {
+                        boatPositions.add(position);
+                        System.out.println("Barco agregado en posición: " + position);
+                        limite--;
+                        nave.setPosition(position);
+                        System.out.println("" + nave.toString());
+                    }
 
-            String position = "" + letter + number;
-            Barco nave = pUniverso1.getNave();
-            if (!boatPositions.contains(position)) {
-                boatPositions.add(position);
-                System.out.println("Barco agregado en posición: " + position);
+                }
+                break;
             }
-            limite--;
-            nave.setPosition(position);
-            System.out.println(""+nave.toString());
-        }
+
+        }).start();
+
 
     }//GEN-LAST:event_pUniverso1MouseClicked
 
@@ -361,24 +388,33 @@ public class FTablero extends javax.swing.JFrame {
 //            }
 //            limitemarcas--;
 //        }
-            if (limitemarcas > 0) {
-            int cellWidth = pUniverso1.getWidth() / pUniverso1.getGRID_SIZE();
-            int cellHeight = pUniverso1.getHeight() / pUniverso1.getGRID_SIZE();
+        new Thread(() -> {
+            Punto marcacheck = pMapa1.getMarca();
+            while (marcacheck != null) {
+                if (limitemarcas > 0 && getpMapa1().isEnabled()) {
+                    int cellWidth = pUniverso1.getWidth() / pUniverso1.getGRID_SIZE();
+                    int cellHeight = pUniverso1.getHeight() / pUniverso1.getGRID_SIZE();
 
-            int column = evt.getX() / cellWidth;
-            int row = evt.getY() / cellHeight;
+                    int column = evt.getX() / cellWidth;
+                    int row = evt.getY() / cellHeight;
 
-            char letter = (char) (alphabet[row]);
-            int number = column + 1;
+                    char letter = (char) (alphabet[row]);
+                    int number = column + 1;
 
-            String position = "" + letter + number;
+                    String position = "" + letter + number;
 
-            if (!marcaPositions.contains(position)) {
-                marcaPositions.add(position);
-                System.out.println("Bomba agregada en posición: " + position);
+                    if (!marcaPositions.contains(position)) {
+                        marcaPositions.add(position);
+                        System.out.println("Bomba agregada en posición: " + position);
+                        limitemarcas--;
+                    }
+
+                }
+                break;
             }
-            limitemarcas--;
-        }
+
+        }).start();
+
     }//GEN-LAST:event_pMapa1MouseClicked
 
     private void BObtenerMarcasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BObtenerMarcasActionPerformed
@@ -387,7 +423,7 @@ public class FTablero extends javax.swing.JFrame {
 
     private void BEnviarUbiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BEnviarUbiActionPerformed
         listaDeBarcos = pUniverso1.getListaDeBarcos();
-        if (!marcaPositions.isEmpty() && marcaPositions != null && marcaPositions.size() == bordemarcas ) {
+        if (!marcaPositions.isEmpty() && marcaPositions != null && marcaPositions.size() == bordemarcas) {
             enviarmarcas();
             BEnviarUbi.setEnabled(false);
             JDialog waitingDialog = new JDialog();
@@ -399,8 +435,8 @@ public class FTablero extends javax.swing.JFrame {
             waitingDialog.setVisible(true);
 //            int status = locationMarca();
             new Thread(() -> {
-
-                while (locationMarca() == 0) {
+                int status = locationMarca();
+                while (status == 0) {
                     try {
                         Thread.sleep(1000); // Wait for 1 second before checking again
                     } catch (InterruptedException ex) {
@@ -409,8 +445,12 @@ public class FTablero extends javax.swing.JFrame {
                 }
 
                 waitingDialog.dispose();
-                
-
+                if (status == 2) {
+                    JOptionPane.showMessageDialog(this, "¡Acertaste!");
+                } else if (status == 3) {
+                    JOptionPane.showMessageDialog(this, "¡Fallaste!");
+                }
+                System.out.println(getTitle()+": "+status);
             }).start();
         } else {
             JOptionPane.showMessageDialog(this, "Envia todos los tiros hacia el oponente!\nTe faltan (" + limitemarcas + ")");

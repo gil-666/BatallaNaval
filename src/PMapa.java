@@ -1,21 +1,32 @@
 
 import java.awt.Color;
 import java.awt.Graphics;
+import javax.swing.JOptionPane;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
-
 /**
  *
  * @author gil
  */
-public class PMapa extends javax.swing.JPanel{
+public class PMapa extends javax.swing.JPanel {
+
     private static final int GRID_SIZE = 10;
     int limit = 2;
+    Punto marca;
+
     public PMapa() {
         initComponents();
+    }
+
+    public Punto getMarca() {
+        return marca;
+    }
+
+    public void setMarca(Punto marca) {
+        this.marca = marca;
     }
 
     public int getLimit() {
@@ -25,7 +36,7 @@ public class PMapa extends javax.swing.JPanel{
     public void setLimit(int limit) {
         this.limit = limit;
     }
-    
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -42,23 +53,23 @@ public class PMapa extends javax.swing.JPanel{
             int x = i * cellWidth;
             g.drawLine(x, 0, x, panelHeight);
         }
-        
+
         //dibujar numeros horizontal arriba
         for (int i = 0; i <= GRID_SIZE; i++) {
-            int x = i * cellWidth + cellWidth /2;
+            int x = i * cellWidth + cellWidth / 2;
             int y = 10;
             g.setColor(Color.black);
-            g.drawString(""+(i+1), x, y);
+            g.drawString("" + (i + 1), x, y);
         }
-        
+
         //dibujar letras en y
         char[] alphabet = "abcdefghijklmnopqrstuvwxyz".toUpperCase().toCharArray();
         for (int i = 0; i <= GRID_SIZE; i++) {
             int x = 1;
-            int y = i * cellHeight + cellHeight - 10 ;
+            int y = i * cellHeight + cellHeight - 10;
             char letra = alphabet[i];
             g.setColor(Color.black);
-            g.drawString(""+letra, x, y);
+            g.drawString("" + letra, x, y);
         }
 
         // Draw horizontal lines
@@ -97,20 +108,28 @@ public class PMapa extends javax.swing.JPanel{
     }// </editor-fold>//GEN-END:initComponents
 
     private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
-        
-        if (limit > 0) {
+
+        if (limit > 0 && isEnabled()) {
             int cellWidth = getWidth() / GRID_SIZE;
             int cellHeight = getHeight() / GRID_SIZE;
 
             int x = evt.getX() / cellWidth * cellWidth;
             int y = evt.getY() / cellHeight * cellHeight;
 
-            Punto pnt = new Punto(x,y);
-        this.add(pnt);
-        pnt.setVisible(true);
-        repaint();
-            limit--;
+            marca = new Punto(x, y);
+            
+            if (!marca.contains(x, y)) {
+                setMarca(marca);
+                this.add(marca);
+                marca.setVisible(true);
+                repaint();
+                limit--;
+            }else{
+                JOptionPane.showMessageDialog(this, "Ya pusiste ahí!");
+            }
+
         }
+
     }//GEN-LAST:event_formMouseClicked
 
 

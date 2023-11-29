@@ -45,6 +45,33 @@ public class Conexion extends Thread{
             ex.printStackTrace();
         }
     }
+    
+    public void enviarVictoria(int victoria){
+        try {
+            salida.flush();
+            salida.writeObject(victoria);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+    
+    public int recibirVictoria() {
+        int victoria = 0;
+        try {
+            Object mensaje = entrada.readObject();
+            
+            if (mensaje instanceof Integer) {
+                victoria = (Integer) mensaje;
+            }else{
+                victoria = 0;
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        
+        return victoria;
+    }
+    
     public void cerrarConexiones(){
         try {
             entrada.close();

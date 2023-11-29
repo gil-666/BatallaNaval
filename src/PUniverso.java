@@ -3,6 +3,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.List;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -26,11 +27,11 @@ public class PUniverso extends javax.swing.JPanel {
     public void setNave(Barco nave) {
         this.nave = nave;
     }
-    
+
     public List<Barco> getListaDeBarcos() {
         return listaDeBarcos;
     }
-    
+
     private static final int CELL_SIZE = 20;
     int limit = 5;//limite de 5 barcos 
 
@@ -48,9 +49,11 @@ public class PUniverso extends javax.swing.JPanel {
     public void setLimit(int limit) {
         this.limit = limit;
     }
-public static int getGRID_SIZE() {
+
+    public static int getGRID_SIZE() {
         return GRID_SIZE;
     }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -67,23 +70,23 @@ public static int getGRID_SIZE() {
             int x = i * cellWidth;
             g.drawLine(x, 0, x, panelHeight);
         }
-        
+
         //dibujar numeros horizontal arriba
         for (int i = 0; i <= GRID_SIZE; i++) {
-            int x = i * cellWidth + cellWidth /2;
+            int x = i * cellWidth + cellWidth / 2;
             int y = 10;
             g.setColor(Color.white);
-            g.drawString(""+(i+1), x, y);
+            g.drawString("" + (i + 1), x, y);
         }
-        
+
         //dibujar letras en y
         char[] alphabet = "abcdefghijklmnopqrstuvwxyz".toUpperCase().toCharArray();
         for (int i = 0; i <= GRID_SIZE; i++) {
             int x = 1;
-            int y = i * cellHeight + cellHeight - 10 ;
+            int y = i * cellHeight + cellHeight - 10;
             char letra = alphabet[i];
             g.setColor(Color.white);
-            g.drawString(""+letra, x, y);
+            g.drawString("" + letra, x, y);
         }
 
         // Draw horizontal lines
@@ -130,16 +133,23 @@ public static int getGRID_SIZE() {
 
             int x = evt.getX() / cellWidth * cellWidth;
             int y = evt.getY() / cellHeight * cellHeight;
-            
+
             nave = new Barco(x, y, positionbarco);
-            setNave(nave);
-            listaDeBarcos.add(nave);
-            this.add(nave);
-            nave.setVisible(true);
-            repaint();
-            limit--;
-//            System.out.println("objeto barco: "+nave.toString());
+            if (!nave.contains(x, y)) {
+                setNave(nave);
+                listaDeBarcos.add(nave);
+                this.add(nave);
+                nave.setVisible(true);
+                repaint();
+                limit--;
+                System.out.println("objeto barco: " + nave.toString());
+            }else{
+                JOptionPane.showMessageDialog(this, "Ya pusiste un barco ahi!");
+            }
+
         }
+
+
     }//GEN-LAST:event_formMouseClicked
 
 

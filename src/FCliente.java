@@ -21,12 +21,13 @@ public class FCliente extends FTablero implements Serializable {
     List<String> marcaOponente;
     List<String> aciertos;
     int vidas = 5;
+    //boolean hit = false;
 
     public FCliente(String ip) {
         super("Cliente");
         try {
-            cnx = new Conexion(new Socket(ip, 7000), this);
-            getLVidas1().setText(""+obtenerVidas());
+            cnx = new Conexion(new Socket(ip, 6798), this);
+            getLVidas1().setText("" + obtenerVidas());
 //            String name = JOptionPane.showInputDialog(this, this.getTitle() + ": Ingresa un nombre de usuario");
 //            user = new Usuario(name);
         } catch (IOException ex) {
@@ -85,36 +86,47 @@ public class FCliente extends FTablero implements Serializable {
 
     @Override
     public int locationMarca() {
-
         try {
             marcaOponente = cnx.recibir();
             System.out.println(getTitle() + " oponente posiciones:");
             if (marcaOponente != null) {
-                for (String point : marcaOponente) {
-                    System.out.println(point);
-                }
-                aciertos = obtenerAciertos(marcaOponente, getBoatPositions());
-                System.out.println("barcos acertados por " + getTitle() + ": " + aciertos.toString());
+                boolean hit = false; // Flag to determine if any boat got hit
+
                 for (Barco boat : getListaDeBarcos()) {
                     String boatPosition = boat.getPosition();
-                    if (aciertos.contains(boatPosition)) {
+                    if (marcaOponente.contains(boatPosition)) {
                         boat.explotar();
-                        quitarVida(boat);
-                        getLVidas1().setText(""+obtenerVidas());
+                        hit = true; // Flag it as a hit
+                        if (vidas != 0) { // If there are lives remaining after the explosion
+                            quitarVida(boat);
+                            getLVidas1().setText("" + obtenerVidas());
+                            if (cnx.recibirVictoria() == 1) {
+                                JOptionPane.showMessageDialog(this, "Ganaste!");
+                                //resetGame(); // Reset the game if the player wins
+                                return 1;
+                            }
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Has perdido!");
+                            //resetGame(); // Reset the game if the player loses
+                            return 1;
+                        }
                     }
                 }
-                return 1;
+
+                // Separate hit detection from message display
+                if (hit) {
+                    return 2; // Indicate a hit
+                } else {
+                    return 3; // Indicate a miss
+                }
             } else {
                 return 0;
             }
-
         } catch (Exception e) {
-            // Handle specific exceptions
             e.printStackTrace(); // Consider logging the exception for debugging
             JOptionPane.showMessageDialog(this, "Error receiving data from opponent!");
-            return 0; // Return 0 as an indication of an error or no data received
+            return 0;
         }
-
     }
 
     public List<String> obtenerAciertos(List<String> marcaOponente, List<String> posBarcosjugador) {
