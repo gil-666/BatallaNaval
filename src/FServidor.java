@@ -26,6 +26,9 @@ public class FServidor extends FTablero implements Serializable {
     List<String> marcaOponente;
     List<String> aciertos;
     char[] alphabet = "abcdefghijklmnopqrstuvwxyz".toUpperCase().toCharArray();
+    int vidas = 5;
+    
+    
 
     public FServidor() {
         super("Servidor");
@@ -33,8 +36,8 @@ public class FServidor extends FTablero implements Serializable {
             ss = new ServerSocket(7000);
             
             JDialog esperando = new JDialog();
-            esperando.setUndecorated(true);
-            JLabel mensaje = new JLabel("Esperando a que un jugador se una...");
+//            esperando.setUndecorated(false);
+            JLabel mensaje = new JLabel("Esperando a que un jugador se una...");// DIALOGO QUE ESPERA A QUE SE CONECTE EL CLIENTE
             mensaje.setHorizontalAlignment(SwingConstants.CENTER);
             esperando.add(mensaje);
             esperando.setSize(300, 100);
@@ -47,6 +50,7 @@ public class FServidor extends FTablero implements Serializable {
 //            String name = JOptionPane.showInputDialog(this, this.getTitle() + ": Ingresa un nombre de usuario");
 //            user = new Usuario(name);
             esperando.dispose();
+            getLVidas1().setText(""+obtenerVidas());
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -66,7 +70,15 @@ public class FServidor extends FTablero implements Serializable {
     public void cerrar() {
         cnx.cerrarConexiones();
     }
-
+    @Override
+    public int obtenerVidas() {
+        return vidas;
+    }
+    @Override
+    public void quitarVida(Barco boat){
+        getListaDeBarcos().remove(boat);
+        vidas--;
+    }
     public int locationOponente() {
 
         try {
@@ -105,7 +117,16 @@ public class FServidor extends FTablero implements Serializable {
                     String boatPosition = boat.getPosition();
                     if (aciertos.contains(boatPosition)) {
                         boat.explotar();
-                        // Additional logic based on hit boat, if required
+                        if(vidas > 0){
+                            quitarVida(boat);
+                            getLVidas1().setText(""+obtenerVidas());
+                        }else{
+                            JOptionPane.showMessageDialog(this, "Has perdido!");
+                        }
+                        
+                    }
+                    else{
+                        
                     }
                 }
                 return 1;

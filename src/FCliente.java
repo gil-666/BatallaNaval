@@ -20,10 +20,13 @@ public class FCliente extends FTablero implements Serializable {
     List<String> posOponente;
     List<String> marcaOponente;
     List<String> aciertos;
-    public FCliente() {
+    int vidas = 5;
+
+    public FCliente(String ip) {
         super("Cliente");
         try {
-            cnx = new Conexion(new Socket("localhost", 7000), this);
+            cnx = new Conexion(new Socket(ip, 7000), this);
+            getLVidas1().setText(""+obtenerVidas());
 //            String name = JOptionPane.showInputDialog(this, this.getTitle() + ": Ingresa un nombre de usuario");
 //            user = new Usuario(name);
         } catch (IOException ex) {
@@ -47,11 +50,22 @@ public class FCliente extends FTablero implements Serializable {
     }
 
     @Override
+    public int obtenerVidas() {
+        return vidas;
+    }
+
+    @Override
+    public void quitarVida(Barco boat) {
+        getListaDeBarcos().remove(boat);
+        vidas--;
+    }
+
+    @Override
     public int locationOponente() {
-        
+
         try {
             posOponente = cnx.recibir();
-            System.out.println(getTitle()+" oponente posiciones:");
+            System.out.println(getTitle() + " oponente posiciones:");
             if (posOponente != null) {
                 for (String point : posOponente) {
                     System.out.println(point);
@@ -85,7 +99,8 @@ public class FCliente extends FTablero implements Serializable {
                     String boatPosition = boat.getPosition();
                     if (aciertos.contains(boatPosition)) {
                         boat.explotar();
-                        // Additional logic based on hit boat, if required
+                        quitarVida(boat);
+                        getLVidas1().setText(""+obtenerVidas());
                     }
                 }
                 return 1;
@@ -117,7 +132,7 @@ public class FCliente extends FTablero implements Serializable {
     }
 
     public static void main(String[] args) {
-        new FCliente().setVisible(true);
+        new FCliente("").setVisible(true);
 
     }
 }
