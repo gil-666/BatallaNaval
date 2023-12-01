@@ -1,6 +1,8 @@
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JOptionPane;
 
 /*
@@ -16,6 +18,7 @@ public class PMapa extends javax.swing.JPanel {
     private static final int GRID_SIZE = 10;
     int limit = 2;
     Punto marca;
+    List<Punto> placedPoints = new ArrayList<>();
 
     public PMapa() {
         initComponents();
@@ -116,22 +119,27 @@ public class PMapa extends javax.swing.JPanel {
             int x = evt.getX() / cellWidth * cellWidth;
             int y = evt.getY() / cellHeight * cellHeight;
 
-            marca = new Punto(x, y);
-            
-            if (!marca.contains(x, y)) {
-                setMarca(marca);
-                this.add(marca);
-                marca.setVisible(true);
+            Punto newPoint = new Punto(x, y);
+            if (!pointAlreadyPlaced(newPoint)) {
+                placedPoints.add(newPoint); // Add the new point to the list
+                setMarca(newPoint);
+                this.add(newPoint);
+                newPoint.setVisible(true);
                 repaint();
                 limit--;
-            }else{
+            } else {
                 JOptionPane.showMessageDialog(this, "Ya pusiste ahí!");
             }
-
         }
-
     }//GEN-LAST:event_formMouseClicked
-
+    private boolean pointAlreadyPlaced(Punto newPoint) {
+        for (Punto existingPoint : placedPoints) {
+            if (existingPoint.contains(newPoint.getX(), newPoint.getY())) {
+                return true; // The grid location is already occupied by a point
+            }
+        }
+        return false; // The grid location is not occupied
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables

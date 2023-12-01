@@ -430,28 +430,34 @@ public class FTablero extends javax.swing.JFrame {
             waitingDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
             waitingDialog.setLayout(new BorderLayout());
             waitingDialog.add(new JLabel("Esperando al oponente..."), BorderLayout.CENTER);
+            waitingDialog.setTitle(getTitle());
             waitingDialog.pack();
             waitingDialog.setLocationRelativeTo(null); // Center the dialog
             waitingDialog.setVisible(true);
 //            int status = locationMarca();
             new Thread(() -> {
-                int status = locationMarca();
-                while (status == 0) {
+                int status;
+                
+                do {
+                    status = locationMarca();
+                    System.out.println(getTitle() + ":starting " + status);
                     try {
                         Thread.sleep(1000); // Wait for 1 second before checking again
                     } catch (InterruptedException ex) {
                         ex.printStackTrace();
                     }
-                }
+                } while (status == 0);
 
                 waitingDialog.dispose();
+
                 if (status == 2) {
                     JOptionPane.showMessageDialog(this, "¡Acertaste!");
                 } else if (status == 3) {
                     JOptionPane.showMessageDialog(this, "¡Fallaste!");
                 }
-                System.out.println(getTitle()+": "+status);
+                System.out.println(getTitle() + ": " + status);
             }).start();
+
         } else {
             JOptionPane.showMessageDialog(this, "Envia todos los tiros hacia el oponente!\nTe faltan (" + limitemarcas + ")");
             System.out.println("restante " + limitemarcas);

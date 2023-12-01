@@ -104,50 +104,52 @@ public class FServidor extends FTablero implements Serializable {
     }
 
     @Override
-public int locationMarca() {
-    try {
-        marcaOponente = cnx.recibir();
-        System.out.println(getTitle() + " oponente posiciones:");
-        if (marcaOponente != null) {
-            boolean hit = false; // Flag to determine if any boat got hit
+    public int locationMarca() {
+        try {
+            marcaOponente = cnx.recibir();
+            System.out.println(getTitle() + " oponente posiciones:");
 
-            for (Barco boat : getListaDeBarcos()) {
-                String boatPosition = boat.getPosition();
-                if (marcaOponente.contains(boatPosition)) {
-                    boat.explotar();
-                    hit = true; // Flag it as a hit
-                    if (vidas != 0) { // If there are lives remaining after the explosion
-                        quitarVida(boat);
-                        getLVidas1().setText("" + obtenerVidas());
-                        if (cnx.recibirVictoria() == 1) {
-                            JOptionPane.showMessageDialog(this, "Ganaste!");
-                            //resetGame(); // Reset the game if the player wins
-                            return 1;
+            if (marcaOponente != null) {
+                boolean hit = false; // Flag to determine if any boat got hit
+
+                for (String opponentPosition : marcaOponente) {
+                    for (Barco boat : getListaDeBarcos()) {
+                        String boatPosition = boat.getPosition();
+                        if (opponentPosition.equals(boatPosition)) {
+                            boat.explotar();
+                            hit = true; // Flag it as a hit
+                            if (vidas != 0) { // If there are lives remaining after the explosion
+                                quitarVida(boat);
+                                getLVidas1().setText("" + obtenerVidas());
+                                if (cnx.recibirVictoria() == 1) {
+                                    JOptionPane.showMessageDialog(this, "Ganaste!");
+                                    return 1; // Indicate a hit
+                                }
+                                return 1; // Indicate a hit
+                            } else {
+                                cnx.enviarVictoria(1);
+                                JOptionPane.showMessageDialog(this, "Has perdido!");
+                                return 1; // Indicate a loss
+                            }
                         }
-                    } else {
-                        JOptionPane.showMessageDialog(this, "Has perdido!");
-                        //resetGame(); // Reset the game if the player loses
-                        return 1;
                     }
                 }
-            }
 
-            // Separate hit detection from message display
-            if (hit) {
-                return 2; // Indicate a hit
+                // Separate hit detection from message display
+                if (hit) {
+                    return 2; // Indicate a hit
+                } else {
+                    return 3; // Indicate a miss
+                }
             } else {
-                return 3; // Indicate a miss
+                return 0; // Indicate no data received
             }
-        } else {
-            return 0;
+        } catch (Exception e) {
+            e.printStackTrace(); // Consider logging the exception for debugging
+            JOptionPane.showMessageDialog(this, "Error receiving data from opponent!");
+            return -1; // Indicate an error state
         }
-    } catch (Exception e) {
-        e.printStackTrace(); // Consider logging the exception for debugging
-        JOptionPane.showMessageDialog(this, "Error receiving data from opponent!");
-        return 0;
     }
-}
-
 
     public void ReiniciarJuego() {
 

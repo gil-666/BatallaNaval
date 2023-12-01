@@ -43,23 +43,25 @@ public class Barco extends JLabel implements Serializable {
     }
 
     public void explotar() {
-        URL sonido = getClass().getResource("explosion.wav");
-        try {
-            AudioInputStream in = AudioSystem.getAudioInputStream(sonido);
+        new Thread(() -> {
+            URL sonido = getClass().getResource("explosion.wav");
+            try {
+                AudioInputStream in = AudioSystem.getAudioInputStream(sonido);
 
-            Clip clip = AudioSystem.getClip();
-            clip.open(in);
-            clip.start();
-        } catch (LineUnavailableException ex) {
-            Logger.getLogger(Barco.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (UnsupportedAudioFileException ex) {
-            Logger.getLogger(Barco.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(Barco.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        setImg(new ImageIcon(getClass().getResource("explosion.png")));
-        repaint();
-        JOptionPane.showMessageDialog(this, "Tu barco en "+getPosition()+" recibió un misil!");
+                Clip clip = AudioSystem.getClip();
+                clip.open(in);
+                clip.start();
+            } catch (LineUnavailableException ex) {
+                Logger.getLogger(Barco.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (UnsupportedAudioFileException ex) {
+                Logger.getLogger(Barco.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(Barco.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            setImg(new ImageIcon(getClass().getResource("explosion.png")));
+            repaint();
+            JOptionPane.showMessageDialog(this, "Tu barco en " + getPosition() + " recibió un misil!");
+        }).start();
 
     }
 
