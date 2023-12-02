@@ -60,6 +60,10 @@ public class FTablero extends javax.swing.JFrame {
         return BEnviarbarco;
     }
 
+    public void setMarcaPositions(List<String> marcaPositions) {
+        this.marcaPositions = marcaPositions;
+    }
+
     public List<Barco> getListaDeBarcos() {
         return listaDeBarcos;
     }
@@ -452,8 +456,10 @@ public class FTablero extends javax.swing.JFrame {
 
                 if (status == 2) {
                     JOptionPane.showMessageDialog(this, "¡Acertaste!");
+                    waitingDialog.dispose();
                 } else if (status == 3) {
                     JOptionPane.showMessageDialog(this, "¡Fallaste!");
+                    waitingDialog.dispose();
                 }
                 System.out.println(getTitle() + ": " + status);
             }).start();

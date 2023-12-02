@@ -125,22 +125,25 @@ public class FServidor extends FTablero implements Serializable {
                                     JOptionPane.showMessageDialog(this, "Ganaste!");
                                     return 1; // Indicate a hit
                                 }
+                                ReiniciarJuego();
                                 return 1; // Indicate a hit
                             } else {
                                 cnx.enviarVictoria(1);
                                 JOptionPane.showMessageDialog(this, "Has perdido!");
                                 return 1; // Indicate a loss
                             }
+                            
                         }
+                        break;
                     }
                 }
 
                 // Separate hit detection from message display
-                if (hit) {
-                    return 2; // Indicate a hit
-                } else {
-                    return 3; // Indicate a miss
-                }
+//                if (hit) {
+//                    return 2; // Indicate a hit
+//                } else {
+//                    return 3; // Indicate a miss
+//                }
             } else {
                 return 0; // Indicate no data received
             }
@@ -149,10 +152,13 @@ public class FServidor extends FTablero implements Serializable {
             JOptionPane.showMessageDialog(this, "Error receiving data from opponent!");
             return -1; // Indicate an error state
         }
+        return 1;
     }
 
     public void ReiniciarJuego() {
-
+        getBEnviarUbi().setEnabled(true);
+        getMarcaPositions().clear();
+        repaint();
     }
 
     public List<String> obtenerAciertos(List<String> marcaOponente, List<String> posBarcosjugador) {
