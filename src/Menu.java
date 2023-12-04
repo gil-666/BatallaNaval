@@ -1,11 +1,11 @@
 
+import java.net.ConnectException;
 import javax.swing.JOptionPane;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-
 /**
  *
  * @author gil
@@ -105,8 +105,13 @@ public class Menu extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         new Thread(() -> {
-            FCliente cliente = new FCliente("localhost");
-            cliente.setVisible(true);
+            try {
+                FCliente cliente = new FCliente("localhost");
+                cliente.setVisible(true);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Error al conectar");
+            }
+
         }).start();
 
     }//GEN-LAST:event_jButton2ActionPerformed
@@ -114,11 +119,15 @@ public class Menu extends javax.swing.JFrame {
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         new Thread(() -> {
             String ip = JOptionPane.showInputDialog(this, "Ingrese ip del jugador");
-            if (ip != null){
-                FCliente cliente = new FCliente(ip);
-                cliente.setVisible(true);
+            if (ip != null) {
+                try {
+                    FCliente cliente = new FCliente(ip);
+                    cliente.setVisible(true);
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this, "Error al conectar");
+                }
             }
-            
+
         }).start();
     }//GEN-LAST:event_jButton3ActionPerformed
 

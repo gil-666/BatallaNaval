@@ -15,6 +15,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -24,19 +25,22 @@ public class FCliente extends FTablero implements Serializable {
 
     Conexion cnx;
     Conexion vic;
+    Conexion cic;
     Usuario user;
     List<String> posOponente;
     List<String> marcaOponente;
     List<String> aciertos;
     int vidas = 5;
     //boolean hit = false;
-
+    private ExecutorService executor = Executors.newSingleThreadExecutor();
+    
     public FCliente(String ip) {
         super("Cliente");
         try {
             cnx = new Conexion(new Socket(ip, 6798), this);
             vic = new Conexion(new Socket(ip, 6898), this);
-            getLVidas1().setText("" + obtenerVidas());
+            cic = new Conexion(new Socket(ip, 6998), this);
+            getLVidas1().setText("" + vidas);
 
 //            String name = JOptionPane.showInputDialog(this, this.getTitle() + ": Ingresa un nombre de usuario");
 //            user = new Usuario(name);
@@ -51,22 +55,42 @@ public class FCliente extends FTablero implements Serializable {
             while (true) {
                 if (vidas <= 0) {
                     this.setVisible(false);
-                    JOptionPane.showMessageDialog(this, "Perdiste!! :(");
-                    this.dispose();
+                    enviarvictoria();
+                    JOptionPane.showMessageDialog(this, "Perdiste :(");
                     break;
                 }
+
                 try {
-                    Thread.sleep(1000); // Adjust the duration between checks
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
         }).start();
+
+        executor.submit(() -> {
+            while (true) {
+                try {
+                    Thread.sleep(2000); 
+                    if (cic.recibirEstadoDeVictoria()) {
+                        SwingUtilities.invokeLater(() -> {
+                            this.setVisible(false);
+                            JOptionPane.showMessageDialog(this, "¡Ganaste!");
+                            this.dispose();
+                        });
+                        executor.shutdownNow(); // Stop the victory checking thread
+                        break;
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     @Override
     public void enviarvictoria() {
-        cnx.enviarEstadoDeVictoria(true);
+        cic.enviarEstadoDeVictoria(true);
     }
 
     @Override
@@ -88,16 +112,6 @@ public class FCliente extends FTablero implements Serializable {
     public List<String> obtenerMarcaOponente() {
         List<String> recibido = cnx.recibir();
         return recibido;
-    }
-
-    @Override
-    public int obtenerVidas() {
-        return vidas;
-    }
-
-    @Override
-    public void quitarVida() {
-        vidas--;
     }
 
     @Override
@@ -180,7 +194,7 @@ public class FCliente extends FTablero implements Serializable {
 
         // Send the collected hit positions to the opponent for marking the explosions
         for (String hitPositionToSend : hitPositionsToSend) {
-            cnx.enviarPosicionDeImpacto(hitPositionToSend);
+            vic.enviarPosicionDeImpacto(hitPositionToSend);
         }
 
         ReiniciarJuego();
@@ -221,7 +235,7 @@ public class FCliente extends FTablero implements Serializable {
 
     private void processHitPosition() {
         ExecutorService executor = Executors.newSingleThreadExecutor();
-        Future<String> future = executor.submit(() -> cnx.recibirPosicionDeImpacto());
+        Future<String> future = executor.submit(() -> vic.recibirPosicionDeImpacto());
 
         try {
             String hitPosition = future.get(1000, TimeUnit.MILLISECONDS);
