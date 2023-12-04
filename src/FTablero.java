@@ -48,13 +48,13 @@ public class FTablero extends javax.swing.JFrame {
         borde = pUniverso1.getLimit();
         limitemarcas = pMapa1.getLimit();
         bordemarcas = pMapa1.getLimit();
-        
+
         BEnviarUbi.setEnabled(false);
         pMapa1.setEnabled(false);
 
     }
-    
-    public void resetLimitMarcas(){
+
+    public void resetLimitMarcas() {
         pMapa1.setLimit(2);
         limitemarcas = 2;
     }
@@ -79,6 +79,10 @@ public class FTablero extends javax.swing.JFrame {
 
     }
 
+    public List<String> obtenerMarcaOponente() {
+        return null;
+    }
+
     public JLabel getLVidas1() {
         return LVidas1;
     }
@@ -88,7 +92,7 @@ public class FTablero extends javax.swing.JFrame {
     }
 
     public void enviarmarcas(List<String> marcaPositions) {
-        
+
     }
 
     public void cerrar() {
@@ -111,7 +115,7 @@ public class FTablero extends javax.swing.JFrame {
         return 0;
     }
 
-    public void quitarVida(Barco boat) {
+    public void quitarVida() {
 
     }
 
@@ -364,14 +368,14 @@ public class FTablero extends javax.swing.JFrame {
 
                     String position = "" + letter + number;
                     Barco nave = pUniverso1.getNave();
-                    
+
                     if (!boatPositions.contains(position)) {
                         boatPositions.add(position);
                         System.out.println("Barco agregado en posición: " + position);
                         limite--;
                         nave.setPosition(position);
                         System.out.println("" + nave.toString());
-                    }else{
+                    } else {
                         System.out.println("pe");
                     }
 
@@ -405,90 +409,92 @@ public class FTablero extends javax.swing.JFrame {
 //        new Thread(() -> {
 //            Punto marcacheck = pMapa1.getMarca();
 //            while (marcacheck != null) {
-                if (limitemarcas > 0 && getpMapa1().isEnabled()) {
-                    int cellWidth = pUniverso1.getWidth() / pUniverso1.getGRID_SIZE();
-                    int cellHeight = pUniverso1.getHeight() / pUniverso1.getGRID_SIZE();
+        if (limitemarcas > 0 && getpMapa1().isEnabled()) {
+            int cellWidth = pUniverso1.getWidth() / pUniverso1.getGRID_SIZE();
+            int cellHeight = pUniverso1.getHeight() / pUniverso1.getGRID_SIZE();
 
-                    int column = evt.getX() / cellWidth;
-                    int row = evt.getY() / cellHeight;
+            int column = evt.getX() / cellWidth;
+            int row = evt.getY() / cellHeight;
 
-                    char letter = (char) (alphabet[row]);
-                    int number = column + 1;
+            char letter = (char) (alphabet[row]);
+            int number = column + 1;
 
-                    String position = "" + letter + number;
+            String position = "" + letter + number;
 
-                    if (!marcaPositions.contains(position)) {
-                        marcaPositions.add(position);
-                        System.out.println("Bomba agregada en posición: " + position);
-                        limitemarcas--;
-                    }
+            if (!marcaPositions.contains(position)) {
+                marcaPositions.add(position);
+                System.out.println("Bomba agregada en posición: " + position);
+                limitemarcas--;
+            }
 
-                }System.out.println("restante " + limitemarcas);
-                System.out.println("size " + marcaPositions.size());
-                
+        }
+        System.out.println("restante " + limitemarcas);
+        System.out.println("size " + marcaPositions.size());
+
 //            }
-
 //        }).start();
 
     }//GEN-LAST:event_pMapa1MouseClicked
 
     private void BObtenerMarcasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BObtenerMarcasActionPerformed
-        locationMarca();
+//        locationMarca();
     }//GEN-LAST:event_BObtenerMarcasActionPerformed
 
     private void BEnviarUbiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BEnviarUbiActionPerformed
         listaDeBarcos = pUniverso1.getListaDeBarcos();
-        if (!marcaPositions.isEmpty() && marcaPositions != null && marcaPositions.size() == bordemarcas) {
-            enviarmarcas(marcaPositions);
-            System.out.println("BENVIARUBI marcas enviadas: "+marcaPositions);
-            
-            BEnviarUbi.setEnabled(false);
-            JDialog waitingDialog = new JDialog();
-            waitingDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-            waitingDialog.setLayout(new BorderLayout());
-            waitingDialog.add(new JLabel("Esperando al oponente..."), BorderLayout.CENTER);
-            waitingDialog.setTitle(getTitle());
-            waitingDialog.pack();
-            waitingDialog.setLocationRelativeTo(null); // Center the dialog
-            waitingDialog.setVisible(true);
-//            int status = locationMarca();
-            new Thread(() -> {
-                int status;
-                
-                do {
-                    status = locationMarca();
-                    System.out.println(getTitle() + ": " + status);
-                    try {
-                        Thread.sleep(1000); // Wait for 1 second before checking again
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                } while (status == 0);
 
-                waitingDialog.dispose();
-                
-                
-                
-                if (status == 2) {
-                    JOptionPane.showMessageDialog(this, "¡Fallaste!");
-                    waitingDialog.dispose();
-                } else if (status == 3) {
-                    JOptionPane.showMessageDialog(this, "¡Acertaste!");
-                    waitingDialog.dispose();
-                }
-                
-                
-                
-                System.out.println(getTitle() + ": " + status);
-            }).start();
-
+        if (marcaPositions.size() == bordemarcas) {
+            sendMarksAndWait();
         } else {
             JOptionPane.showMessageDialog(this, "Envia todos los tiros hacia el oponente!\nTe faltan (" + limitemarcas + ")");
-            
         }
-        marcaPositions.clear();
-        limitemarcas = 2;
     }//GEN-LAST:event_BEnviarUbiActionPerformed
+    private void sendMarksAndWait() {
+        enviarmarcas(marcaPositions);
+        System.out.println("BENVIARUBI marcas enviadas: " + marcaPositions);
+        marcaPositions.clear();
+        BEnviarUbi.setEnabled(false);
+
+        JDialog waitingDialog = createWaitingDialog();
+        waitingDialog.setVisible(true);
+
+        Thread waitForResponse = new Thread(() -> {
+            int status = locationMarca();
+            while (status == 0) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+            waitingDialog.dispose();
+            handleResponseStatus(status);
+        });
+        waitForResponse.start();
+    }
+
+    private JDialog createWaitingDialog() {
+        JDialog waitingDialog = new JDialog();
+        waitingDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        waitingDialog.setLayout(new BorderLayout());
+        waitingDialog.add(new JLabel("Esperando al oponente..."), BorderLayout.CENTER);
+        waitingDialog.setTitle(getTitle());
+        waitingDialog.pack();
+        waitingDialog.setLocationRelativeTo(null);
+        return waitingDialog;
+    }
+
+    private void handleResponseStatus(int status) {
+        if (status == 2) {
+            JOptionPane.showMessageDialog(this, "¡Fallaste!");
+        } else if (status == 3) {
+            JOptionPane.showMessageDialog(this, "¡Acertaste!");
+        }
+        System.out.println(getTitle() + ": " + status);
+        limitemarcas = 2;
+        marcaPositions.clear();
+    }
 
     /**
      * @param args the command line arguments

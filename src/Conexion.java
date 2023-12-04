@@ -42,11 +42,13 @@ public class Conexion extends Thread{
             System.out.println("tratando de enviar: "+barcoPosiciones.toString());
             salida.flush();
             salida.writeObject(barcoPosiciones);
+            salida.reset();
+            
             
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-        System.out.println("se envio cnx.enviar: "+barcoPosiciones.toString());
+        System.out.println("se envio cnx.enviar: "+salida);
     }
     
     public void enviarVictoria(int victoria){
