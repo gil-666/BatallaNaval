@@ -30,6 +30,11 @@ public class Punto extends JLabel implements Serializable{
         super.paint(g);
         g.drawImage(img.getImage(), 0, 0, getWidth(), getHeight(), null);
     }
+    
+    public void explotar(){
+        setImg(new ImageIcon(getClass().getResource("explosion.png")));
+        repaint();
+    }
 
     public int getX() {
         return x;

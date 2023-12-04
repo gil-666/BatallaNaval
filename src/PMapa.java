@@ -16,12 +16,16 @@ import javax.swing.JOptionPane;
 public class PMapa extends javax.swing.JPanel {
 
     private static final int GRID_SIZE = 10;
-    int limit = 2;
+    int limit = 1;
     Punto marca;
     List<Punto> placedPoints = new ArrayList<>();
 
     public PMapa() {
         initComponents();
+    }
+
+    public static int getGRID_SIZE() {
+        return GRID_SIZE;
     }
 
     public Punto getMarca() {
@@ -127,11 +131,19 @@ public class PMapa extends javax.swing.JPanel {
                 bomba.setVisible(true);
                 repaint();
                 limit--;
+                System.out.println("pmapa punto: x:"+bomba.getX()+"y: "+bomba.getY());
             } else {
                 JOptionPane.showMessageDialog(this, "Ya pusiste ahí!");
             }
         }
     }//GEN-LAST:event_formMouseClicked
+    public void dibujarPuntoen(int x, int y){
+        Punto bomba = new Punto(x, y);
+        bomba.explotar();
+        this.add(bomba);
+        bomba.setVisible(true);
+        repaint();
+    }
     private boolean pointAlreadyPlaced(Punto newPoint) {
         for (Punto existingPoint : placedPoints) {
             if (existingPoint.contains(newPoint.getX(), newPoint.getY())) {

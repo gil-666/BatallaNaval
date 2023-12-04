@@ -6,6 +6,12 @@ import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JDialog;
@@ -21,19 +27,22 @@ import javax.swing.WindowConstants;
 public class FServidor extends FTablero implements Serializable {
 
     Conexion cnx;
+    Conexion vic;
     ServerSocket ss;
+    ServerSocket vv;
     Usuario user;
     List<String> posOponente;
     List<String> marcaOponente;
     List<String> aciertos;
     char[] alphabet = "abcdefghijklmnopqrstuvwxyz".toUpperCase().toCharArray();
-    int vidas = 5;
+    int vidas;
     //boolean hit = false;
 
     public FServidor() {
         super("Servidor");
         try {
             ss = new ServerSocket(6798);
+            vv = new ServerSocket(6898);
 
             JDialog esperando = new JDialog();
 //            esperando.setUndecorated(false);
@@ -44,22 +53,47 @@ public class FServidor extends FTablero implements Serializable {
             esperando.setLocationRelativeTo(null);
             esperando.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
             esperando.setVisible(true);
-
+            vidas = 5;
             cnx = new Conexion(ss.accept(), this);
+            vic = new Conexion(vv.accept(), this);
 
 //            String name = JOptionPane.showInputDialog(this, this.getTitle() + ": Ingresa un nombre de usuario");
 //            user = new Usuario(name);
             esperando.dispose();
             getLVidas1().setText("" + obtenerVidas());
+            checkVidas();
         } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
 
+    private void checkVidas() {
+        new Thread(() -> {
+            while (true) {
+                if (vidas <= 0) {
+                    this.setVisible(false);
+                    JOptionPane.showMessageDialog(this, "Perdiste!! :(");
+                    this.dispose();
+                    break;
+                }
+                try {
+                    Thread.sleep(1000); // Adjust the duration between checks
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    @Override
+    public void enviarvictoria() {
+        cnx.enviarEstadoDeVictoria(true);
+    }
+
     @Override
     public void enviarbarcos() {
         cnx.enviar(getBoatPositions());
-        
+
     }
 
     @Override
@@ -101,13 +135,13 @@ public class FServidor extends FTablero implements Serializable {
                 return 1; // Data received from the opponent
             } else {
 
-                return 0;
+                return -1;
             }
         } catch (Exception e) {
             // Handle specific exceptions
             e.printStackTrace(); // Consider logging the exception for debugging
             JOptionPane.showMessageDialog(this, "Error receiving data from opponent!");
-            return 0; // Return 0 as an indication of an error or no data received
+            return -1; // Return 0 as an indication of an error or no data received
         }
     }
 
@@ -117,9 +151,8 @@ public class FServidor extends FTablero implements Serializable {
         marcaOponente = obtenerMarcaOponente();
 
         if (marcaOponente == null) {
-            return 0; // No data received
+            return -1; // No data received
         }
-
         boolean hit = checkHits();
 
         if (hit) {
@@ -133,53 +166,105 @@ public class FServidor extends FTablero implements Serializable {
 
     private boolean checkHits() {
         boolean hit = false;
-
         for (String opponentPosition : marcaOponente) {
             for (Barco boat : getListaDeBarcos()) {
                 if (boat.getPosition().equals(opponentPosition) && !boat.isExplotado()) {
                     boat.explotar();
                     boat.setExplotado(true);
                     hit = true;
-                    if (vidas != 0) {
-                        quitarVida();
-                        getLVidas1().setText("" + obtenerVidas());
-                    } else {
-                        JOptionPane.showMessageDialog(this, "Perdiste! :(");
-                    }
+                    vidas--;
+                    getLVidas1().setText("" + vidas);
+                    System.out.println("Remaining lives: " + vidas);
+
                     break;
                 }
             }
         }
         return hit;
+
     }
 
     private void handleHit() {
-        ReiniciarJuego();
-    }
+        List<String> hitPositionsToSend = new ArrayList<>();
 
-    private void handleMiss() {
-        ReiniciarJuego();
-    }
-
-    private void ReiniciarJuego() {
-        getBEnviarUbi().setEnabled(true);
-        getpMapa1().setLimit(2);
-        repaint();
-    }
-
-
-    public List<String> obtenerAciertos(List<String> marcaOponente, List<String> posBarcosjugador) {
-        List<String> aciertos = new ArrayList<>();
-
-        for (String str1 : marcaOponente) {
-            for (String str2 : posBarcosjugador) {
-                if (str1.equals(str2)) {
-                    aciertos.add(str1); // Add the intersecting position to the list
+        // Collect hit positions that need to be sent
+        for (String hitPosition : marcaOponente) {
+            for (Barco boat : getListaDeBarcos()) {
+                if (boat.getPosition().equals(hitPosition) && boat.isExplotado()) {
+                    hitPositionsToSend.add(hitPosition);
+                    break;
                 }
             }
         }
 
-        return aciertos; // Return the list of intersecting positions
+        // Send the collected hit positions to the opponent for marking the explosions
+        for (String hitPositionToSend : hitPositionsToSend) {
+            cnx.enviarPosicionDeImpacto(hitPositionToSend);
+        }
+
+        ReiniciarJuego();
+    }
+
+    private void MarcarExplosion(String position) {
+        char letter = position.charAt(0);
+        int number = Integer.parseInt(position.substring(1));
+
+        int row = letter - 'A'; // Convert the letter to a row index (assuming 'A' is 0)
+        int column = number - 1; // Subtract 1 to convert number to a zero-based index
+
+        int cellWidth = getpMapa1().getWidth() / getpMapa1().getGRID_SIZE();
+        int cellHeight = getpMapa1().getHeight() / getpMapa1().getGRID_SIZE();
+
+        int x = column * cellWidth + (cellWidth / 2); // Calculate x coordinate
+        int y = row * cellHeight + (cellHeight / 2);
+        double xPercentage = 0.5;
+        double yPercentage = 0.5;
+
+        int xOffset = (int) (cellWidth * xPercentage - cellWidth);
+        int yOffset = (int) (cellHeight * yPercentage - cellHeight);
+
+        x += xOffset;
+        y += yOffset;
+
+        getpMapa1().dibujarPuntoen(x, y);
+        System.out.println("x: " + x + "y: " + y);
+
+    }
+
+    private void handleMiss() {
+        processHitPosition();
+        ReiniciarJuego();
+    }
+
+    private void processHitPosition() {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Future<String> future = executor.submit(() -> cnx.recibirPosicionDeImpacto());
+
+        try {
+            String hitPosition = future.get(1000, TimeUnit.MILLISECONDS);
+            System.out.println("processhitPosition: " + hitPosition);
+
+            if (hitPosition != null) {
+                MarcarExplosion(hitPosition); // Implement this method to draw explosion at the specified position
+            } else {
+                ReiniciarJuego();
+            }
+        } catch (TimeoutException e) {
+            // Timeout occurred, handle it accordingly
+            System.out.println("Timeout while waiting for hit position");
+            // Perform actions for timeout, e.g., restart game or handle the situation
+            ReiniciarJuego();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace(); // Handle exceptions
+        } finally {
+            executor.shutdownNow(); // Shutdown the executor
+        }
+    }
+
+    private void ReiniciarJuego() {
+        getBEnviarUbi().setEnabled(true);
+        getpMapa1().setLimit(1);
+        repaint();
     }
 
     public static void main(String args[]) {

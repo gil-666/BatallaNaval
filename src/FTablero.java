@@ -39,6 +39,10 @@ public class FTablero extends javax.swing.JFrame {
         return marcaPositions;
     }
 
+    public void enviarvictoria() {
+
+    }
+
     public FTablero(String titulo) {
         setTitle(titulo);
         initComponents();
@@ -51,6 +55,8 @@ public class FTablero extends javax.swing.JFrame {
 
         BEnviarUbi.setEnabled(false);
         pMapa1.setEnabled(false);
+        BEnviarVictoria.setEnabled(true);
+        BEnviarVictoria.setVisible(true);
 
     }
 
@@ -141,6 +147,7 @@ public class FTablero extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
         BEnviarUbi = new javax.swing.JButton();
         BObtenerMarcas = new javax.swing.JButton();
+        BEnviarVictoria = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         BEnviarbarco = new javax.swing.JButton();
         BObtenerBarcos = new javax.swing.JButton();
@@ -207,19 +214,28 @@ public class FTablero extends javax.swing.JFrame {
             }
         });
 
+        BEnviarVictoria.setText("Send victoria");
+        BEnviarVictoria.setEnabled(false);
+        BEnviarVictoria.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BEnviarVictoriaActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGap(135, 135, 135)
-                        .addComponent(BEnviarUbi))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGap(111, 111, 111)
-                        .addComponent(BObtenerMarcas)))
-                .addContainerGap(138, Short.MAX_VALUE))
+                .addGap(135, 135, 135)
+                .addComponent(BEnviarUbi)
+                .addContainerGap(172, Short.MAX_VALUE))
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(111, 111, 111)
+                .addComponent(BObtenerMarcas)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(BEnviarVictoria)
+                .addGap(28, 28, 28))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -227,7 +243,9 @@ public class FTablero extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(BEnviarUbi)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(BObtenerMarcas)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(BObtenerMarcas)
+                    .addComponent(BEnviarVictoria))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -297,7 +315,7 @@ public class FTablero extends javax.swing.JFrame {
                     .addComponent(pUniverso1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(pMapa1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pMapa1, javax.swing.GroupLayout.DEFAULT_SIZE, 389, Short.MAX_VALUE)
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -428,12 +446,11 @@ public class FTablero extends javax.swing.JFrame {
             }
 
         }
-        System.out.println("restante " + limitemarcas);
-        System.out.println("size " + marcaPositions.size());
 
 //            }
 //        }).start();
-
+        System.out.println("restante " + limitemarcas);
+        System.out.println("size " + marcaPositions.size());
     }//GEN-LAST:event_pMapa1MouseClicked
 
     private void BObtenerMarcasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BObtenerMarcasActionPerformed
@@ -445,10 +462,17 @@ public class FTablero extends javax.swing.JFrame {
 
         if (marcaPositions.size() == bordemarcas) {
             sendMarksAndWait();
+            marcaPositions.clear();
+            limitemarcas = 2;
         } else {
             JOptionPane.showMessageDialog(this, "Envia todos los tiros hacia el oponente!\nTe faltan (" + limitemarcas + ")");
         }
+
     }//GEN-LAST:event_BEnviarUbiActionPerformed
+
+    private void BEnviarVictoriaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BEnviarVictoriaActionPerformed
+        enviarvictoria();
+    }//GEN-LAST:event_BEnviarVictoriaActionPerformed
     private void sendMarksAndWait() {
         enviarmarcas(marcaPositions);
         System.out.println("BENVIARUBI marcas enviadas: " + marcaPositions);
@@ -472,6 +496,7 @@ public class FTablero extends javax.swing.JFrame {
             handleResponseStatus(status);
         });
         waitForResponse.start();
+
     }
 
     private JDialog createWaitingDialog() {
@@ -490,10 +515,34 @@ public class FTablero extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "¡Fallaste!");
         } else if (status == 3) {
             JOptionPane.showMessageDialog(this, "¡Acertaste!");
+
         }
         System.out.println(getTitle() + ": " + status);
-        limitemarcas = 2;
-        marcaPositions.clear();
+
+    }
+
+    private void MarcarExplosion(String position) {
+        char letter = position.charAt(0);
+        int number = Integer.parseInt(position.substring(1));
+
+        int row = letter - 'A'; // Convert the letter to a row index (assuming 'A' is 0)
+        int column = number - 1; // Subtract 1 to convert number to a zero-based index
+
+        int cellWidth = getpMapa1().getWidth() / getpMapa1().getGRID_SIZE();
+        int cellHeight = getpMapa1().getHeight() / getpMapa1().getGRID_SIZE();
+
+        int x = column * cellWidth + (cellWidth / 2) + 20; // Calculate x coordinate
+        int y = row * cellHeight + (cellHeight / 2) + 24;
+        int xOffset = cellWidth / 4;
+        int yOffset = cellHeight / 4;
+
+        x += xOffset;
+        y += yOffset;
+
+        getpMapa1().dibujarPuntoen(x, y);
+        getpMapa1().dibujarPuntoen(x, y);
+        System.out.println("x: " + x + "y: " + y);
+
     }
 
     /**
@@ -533,6 +582,7 @@ public class FTablero extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton BEnviarUbi;
+    private javax.swing.JButton BEnviarVictoria;
     private javax.swing.JButton BEnviarbarco;
     private javax.swing.JButton BObtenerBarcos;
     private javax.swing.JButton BObtenerMarcas;
