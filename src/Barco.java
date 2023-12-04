@@ -25,6 +25,7 @@ public class Barco extends JLabel implements Serializable {
     private int y;
     private String position;
     private ImageIcon img;
+    private boolean explotado;
 
     public Barco(int x, int y, String position) {
         this.x = x;
@@ -44,25 +45,30 @@ public class Barco extends JLabel implements Serializable {
 
     public void explotar() {
         new Thread(() -> {
-            URL sonido = getClass().getResource("explosion.wav");
             try {
+                URL sonido = getClass().getResource("explosion.wav");
                 AudioInputStream in = AudioSystem.getAudioInputStream(sonido);
-
                 Clip clip = AudioSystem.getClip();
                 clip.open(in);
                 clip.start();
-            } catch (LineUnavailableException ex) {
-                Logger.getLogger(Barco.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (UnsupportedAudioFileException ex) {
-                Logger.getLogger(Barco.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-                Logger.getLogger(Barco.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (LineUnavailableException | UnsupportedAudioFileException | IOException ex) {
+                ex.printStackTrace();
             }
-            setImg(new ImageIcon(getClass().getResource("explosion.png")));
-            repaint();
-            JOptionPane.showMessageDialog(this, "Tu barco en " + getPosition() + " recibió un misil!");
+        setImg(new ImageIcon(getClass().getResource("explosion.png")));
+        repaint();
+        JOptionPane.showMessageDialog(this, "Tu barco en " + getPosition() + " recibió un misil!");
         }).start();
+        
+        
 
+    }
+
+    public boolean isExplotado() {
+        return explotado;
+    }
+
+    public void setExplotado(boolean explotado) {
+        this.explotado = explotado;
     }
 
     public void setPosition(String position) {
@@ -90,6 +96,10 @@ public class Barco extends JLabel implements Serializable {
     @Override
     public String toString() {
         return "Barco{" + "x=" + x + ", y=" + y + ", position=" + position + ", img=" + img + '}';
+    }
+
+    boolean isExploded() {
+        return explotado;
     }
 
 }

@@ -39,11 +39,14 @@ public class Conexion extends Thread{
     
     public void enviar(List<String> barcoPosiciones){
         try {
+            System.out.println("tratando de enviar: "+barcoPosiciones.toString());
             salida.flush();
             salida.writeObject(barcoPosiciones);
+            
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+        System.out.println("se envio cnx.enviar: "+barcoPosiciones.toString());
     }
     
     public void enviarVictoria(int victoria){
@@ -88,6 +91,7 @@ public class Conexion extends Thread{
             
             if (mensaje instanceof ArrayList) {
                 Posiciones = (List<String>) mensaje;
+                System.out.println("cnx.recibir le llego:"+Posiciones.toString());
             }
         } catch (Exception ex) {
             ex.printStackTrace();

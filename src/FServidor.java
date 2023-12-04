@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.ServerSocket;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -61,8 +62,8 @@ public class FServidor extends FTablero implements Serializable {
     }
 
     @Override
-    public void enviarmarcas() {
-        cnx.enviar(getMarcaPositions());
+    public void enviarmarcas(List<String> marcaPositions) {
+            cnx.enviar(marcaPositions); // Send the marks
     }
 
     @Override
@@ -77,10 +78,10 @@ public class FServidor extends FTablero implements Serializable {
 
     @Override
     public void quitarVida(Barco boat) {
-        getListaDeBarcos().remove(boat);
         vidas--;
     }
 
+    @Override
     public int locationOponente() {
 
         try {
@@ -110,40 +111,34 @@ public class FServidor extends FTablero implements Serializable {
             System.out.println(getTitle() + " oponente posiciones:");
 
             if (marcaOponente != null) {
-                boolean hit = false; // Flag to determine if any boat got hit
+                boolean hit = false; // Reset hit status for this round
 
                 for (String opponentPosition : marcaOponente) {
                     for (Barco boat : getListaDeBarcos()) {
                         String boatPosition = boat.getPosition();
-                        if (opponentPosition.equals(boatPosition)) {
+                        System.out.println("checando barco exploded= " + boat.isExplotado() + "en posicion " + boatPosition + " con marca: " + opponentPosition);
+                        if (boatPosition.equals(opponentPosition) && !boat.isExplotado()) {
                             boat.explotar();
-                            hit = true; // Flag it as a hit
+                            boat.setExplotado(true);
+                            hit = true; // Flag it as a hit for this round
                             if (vidas != 0) { // If there are lives remaining after the explosion
                                 quitarVida(boat);
                                 getLVidas1().setText("" + obtenerVidas());
-                                if (cnx.recibirVictoria() == 1) {
-                                    JOptionPane.showMessageDialog(this, "Ganaste!");
-                                    return 1; // Indicate a hit
-                                }
-                                ReiniciarJuego();
-                                return 1; // Indicate a hit
+                                // Any other necessary game logic here...
                             } else {
-                                cnx.enviarVictoria(1);
-                                JOptionPane.showMessageDialog(this, "Has perdido!");
-                                return 1; // Indicate a loss
+                                JOptionPane.showMessageDialog(this, "Perdiste! :(");
                             }
-                            
+                            break; // Exit the loop for this opponent's position
                         }
-                        break;
                     }
                 }
-
-                // Separate hit detection from message display
-//                if (hit) {
-//                    return 2; // Indicate a hit
-//                } else {
-//                    return 3; // Indicate a miss
-//                }
+                if (hit) {
+                    ReiniciarJuego();
+                    return 2; // enviar golpe
+                } else {
+                    ReiniciarJuego();
+                    return 3; // fallo
+                }
             } else {
                 return 0; // Indicate no data received
             }
@@ -152,12 +147,12 @@ public class FServidor extends FTablero implements Serializable {
             JOptionPane.showMessageDialog(this, "Error receiving data from opponent!");
             return -1; // Indicate an error state
         }
-        return 1;
     }
 
     public void ReiniciarJuego() {
         getBEnviarUbi().setEnabled(true);
-        getMarcaPositions().clear();
+        marcaOponente = new ArrayList<>();
+        getpMapa1().setLimit(2);
         repaint();
     }
 

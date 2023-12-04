@@ -135,7 +135,7 @@ public class PUniverso extends javax.swing.JPanel {
             int y = evt.getY() / cellHeight * cellHeight;
 
             nave = new Barco(x, y, positionbarco);
-            if (!nave.contains(x, y)) {
+//            if (!listaDeBarcos.equals(nave)) {
                 setNave(nave);
                 listaDeBarcos.add(nave);
                 this.add(nave);
@@ -143,9 +143,9 @@ public class PUniverso extends javax.swing.JPanel {
                 repaint();
                 limit--;
                 System.out.println("objeto barco: " + nave.toString());
-            }else{
-                JOptionPane.showMessageDialog(this, "Ya pusiste un barco ahi!");
-            }
+//            }else{
+//                JOptionPane.showMessageDialog(this, "Ya pusiste un barco ahi!");
+//            }
 
         }
 

@@ -3,6 +3,7 @@ import java.awt.BorderLayout;
 import java.util.List;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
@@ -47,9 +48,15 @@ public class FTablero extends javax.swing.JFrame {
         borde = pUniverso1.getLimit();
         limitemarcas = pMapa1.getLimit();
         bordemarcas = pMapa1.getLimit();
+        
         BEnviarUbi.setEnabled(false);
         pMapa1.setEnabled(false);
 
+    }
+    
+    public void resetLimitMarcas(){
+        pMapa1.setLimit(2);
+        limitemarcas = 2;
     }
 
     public JButton getBEnviarUbi() {
@@ -80,8 +87,8 @@ public class FTablero extends javax.swing.JFrame {
         this.LVidas1 = LVidas1;
     }
 
-    public void enviarmarcas() {
-
+    public void enviarmarcas(List<String> marcaPositions) {
+        
     }
 
     public void cerrar() {
@@ -310,7 +317,7 @@ public class FTablero extends javax.swing.JFrame {
     private void BEnviarbarcoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BEnviarbarcoActionPerformed
         if (!boatPositions.isEmpty() && boatPositions != null && boatPositions.size() == borde) {
             enviarbarcos();
-
+            listaDeBarcos = pUniverso1.getListaDeBarcos();
             BEnviarbarco.setEnabled(false);
             JDialog waitingDialog = new JDialog();
             waitingDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
@@ -357,12 +364,15 @@ public class FTablero extends javax.swing.JFrame {
 
                     String position = "" + letter + number;
                     Barco nave = pUniverso1.getNave();
+                    
                     if (!boatPositions.contains(position)) {
                         boatPositions.add(position);
                         System.out.println("Barco agregado en posición: " + position);
                         limite--;
                         nave.setPosition(position);
                         System.out.println("" + nave.toString());
+                    }else{
+                        System.out.println("pe");
                     }
 
                 }
@@ -392,9 +402,9 @@ public class FTablero extends javax.swing.JFrame {
 //            }
 //            limitemarcas--;
 //        }
-        new Thread(() -> {
-            Punto marcacheck = pMapa1.getMarca();
-            while (marcacheck != null) {
+//        new Thread(() -> {
+//            Punto marcacheck = pMapa1.getMarca();
+//            while (marcacheck != null) {
                 if (limitemarcas > 0 && getpMapa1().isEnabled()) {
                     int cellWidth = pUniverso1.getWidth() / pUniverso1.getGRID_SIZE();
                     int cellHeight = pUniverso1.getHeight() / pUniverso1.getGRID_SIZE();
@@ -413,11 +423,12 @@ public class FTablero extends javax.swing.JFrame {
                         limitemarcas--;
                     }
 
-                }
-                break;
-            }
+                }System.out.println("restante " + limitemarcas);
+                System.out.println("size " + marcaPositions.size());
+                
+//            }
 
-        }).start();
+//        }).start();
 
     }//GEN-LAST:event_pMapa1MouseClicked
 
@@ -428,7 +439,9 @@ public class FTablero extends javax.swing.JFrame {
     private void BEnviarUbiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BEnviarUbiActionPerformed
         listaDeBarcos = pUniverso1.getListaDeBarcos();
         if (!marcaPositions.isEmpty() && marcaPositions != null && marcaPositions.size() == bordemarcas) {
-            enviarmarcas();
+            enviarmarcas(marcaPositions);
+            System.out.println("BENVIARUBI marcas enviadas: "+marcaPositions);
+            
             BEnviarUbi.setEnabled(false);
             JDialog waitingDialog = new JDialog();
             waitingDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
@@ -444,32 +457,37 @@ public class FTablero extends javax.swing.JFrame {
                 
                 do {
                     status = locationMarca();
-                    System.out.println(getTitle() + ":starting " + status);
+                    System.out.println(getTitle() + ": " + status);
                     try {
                         Thread.sleep(1000); // Wait for 1 second before checking again
-                    } catch (InterruptedException ex) {
+                    } catch (Exception ex) {
                         ex.printStackTrace();
                     }
                 } while (status == 0);
 
                 waitingDialog.dispose();
-
+                
+                
+                
                 if (status == 2) {
-                    JOptionPane.showMessageDialog(this, "¡Acertaste!");
-                    waitingDialog.dispose();
-                } else if (status == 3) {
                     JOptionPane.showMessageDialog(this, "¡Fallaste!");
                     waitingDialog.dispose();
+                } else if (status == 3) {
+                    JOptionPane.showMessageDialog(this, "¡Acertaste!");
+                    waitingDialog.dispose();
                 }
+                
+                
+                
                 System.out.println(getTitle() + ": " + status);
             }).start();
 
         } else {
             JOptionPane.showMessageDialog(this, "Envia todos los tiros hacia el oponente!\nTe faltan (" + limitemarcas + ")");
-            System.out.println("restante " + limitemarcas);
-            System.out.println("size " + marcaPositions.size());
+            
         }
-
+        marcaPositions.clear();
+        limitemarcas = 2;
     }//GEN-LAST:event_BEnviarUbiActionPerformed
 
     /**

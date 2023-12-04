@@ -119,12 +119,12 @@ public class PMapa extends javax.swing.JPanel {
             int x = evt.getX() / cellWidth * cellWidth;
             int y = evt.getY() / cellHeight * cellHeight;
 
-            Punto newPoint = new Punto(x, y);
-            if (!pointAlreadyPlaced(newPoint)) {
-                placedPoints.add(newPoint); // Add the new point to the list
-                setMarca(newPoint);
-                this.add(newPoint);
-                newPoint.setVisible(true);
+            Punto bomba = new Punto(x, y);
+            if (!pointAlreadyPlaced(bomba)) {
+                placedPoints.add(bomba); // Add the new point to the list
+                setMarca(bomba);
+                this.add(bomba);
+                bomba.setVisible(true);
                 repaint();
                 limit--;
             } else {
